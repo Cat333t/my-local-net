@@ -1,0 +1,30 @@
+/* @import url(""); */
+@import "tailwindcss";
+
+@theme { /* hsl */
+    --primary-color: 202, 66%, 39%;
+    --secondary-color: 180, 83%, 79%;
+
+    /* --bg-dark: ;
+    --bg: ;
+    --bg-light: ;
+
+    --text: ; */
+}
+
+.dark {
+    --primary-color: 202, 66%, 39%;
+    --secondary-color: 180, 83%, 79%;
+
+    --bg-dark: 276, 100%, 5%;
+    --bg: 276, 100%, 10%;
+    --bg-light: 276, 100%, 15%;
+
+    --text: ;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}

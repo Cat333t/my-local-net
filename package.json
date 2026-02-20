@@ -1,0 +1,30 @@
+{
+  "name": "my-local-net",
+  "private": true,
+  "version": "0.0.1",
+  "description": "",
+  "author": "Kostya",
+  "scripts": {
+    "start": "node server/dist/cli.js",
+    "build": "pnpm -r build",
+    "dev": "nodemon --no-stdin --exec \"tsx\" --signal SIGTERM server/src/cli.ts",
+    "dev:all": "pnpm -r dev"
+  },
+  "type": "module",
+  "keywords": [],
+  "license": "MIT",
+  "packageManager": "pnpm@10.30.1",
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^24.10.13",
+    "cross-spawn": "^7.0.6",
+    "nodemon": "^3.1.13",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@types/dotenv": "^8.2.3",
+    "dotenv": "^17.3.1",
+    "tree-kill": "^1.2.2"
+  }
+}
