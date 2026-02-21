@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx watch src/server.ts",
     "build": "tsc",
-    "start": "NODE_ENV=production node dist/server.js"
+    "start": "NODE_ENV=production node dist/server.js",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@types/cors": "^2.8.19",
@@ -13,7 +14,14 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/express": "^5.0.6",
-    "ts-node-dev": "^2.0.0"
+    "@types/node": "^24.10.13",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript-eslint": "^8.55.0"
   }
 }

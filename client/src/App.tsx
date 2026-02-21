@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './styles/App.css'
 
-import { ThemeProvider } from './contexts/Theme'
+import { ThemeProvider } from './providers/ThemeProvider'
 
 function App() {
   const [text, setText] = useState('')

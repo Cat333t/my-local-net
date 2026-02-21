@@ -10,13 +10,13 @@ import { ChildProcess } from "child_process";
 
 const protocol = process.env.HTTPS ? "https" : "http"
 const PORT = process.env.APP_PORT ? Number(process.env.APP_PORT) : 80
-const HOST = process.env.HOST || "0.0.0.0"
+const HOST = process.env.HOST || "localhost"
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let isLogging = true
 
-let subProcesses: SubProcess[] = []
-let networkAddresses: { server: string[], client: string[] } = {
+const subProcesses: SubProcess[] = []
+const networkAddresses: { server: string[], client: string[] } = {
     server: [], // http://192.168.1.14:81
     client: [] // http://192.168.1.14:80
 }
@@ -152,18 +152,33 @@ const commands: Command[] = [
 ];
 
 const show = {
-    log: (msg?: any, immediate = false): void => {
+    log: (msg?: unknown, immediate = false): void => {
         if (!isLogging && !immediate) return;
 
         readline.cursorTo(process.stdout, 0);
         readline.clearLine(process.stdout, 0);
 
-        console.log(msg);
+        if (typeof msg === "string" || typeof msg === "number" || typeof msg === "boolean") {
+            console.log(msg);
+        } else if (typeof msg === "object") {
+            console.log(JSON.stringify(msg, null, 2));
+        } else {
+            console.log(msg);
+        }
 
         rl.prompt(true);
     },
-    error: (msg?: any, immediate: boolean = false): void => {
-        show.log(`\x1b[31m${msg}\x1b[0m`, immediate);
+    error: (msg?: unknown, immediate: boolean = false): void => {
+        let output: unknown;
+        if (typeof msg === "string" || typeof msg === "number" || typeof msg === "boolean") {
+            output = msg;
+        } else if (typeof msg === "object") {
+            output = JSON.stringify(msg, null, 2);
+        } else {
+            output = msg;
+        }
+
+        show.log(`\x1b[31m${output}\x1b[0m`, immediate);
     }
 }
 
@@ -287,13 +302,14 @@ function runApp() {
 
         const proc = runScript(
             "pnpm",
-            ["--filter", filter, "dev"],
+            ["--filter", filter, process.env.NODE_ENV === "production" ? "start" : "dev"],
             path.resolve(__dirname, "../.."),
             name
         );
 
         if (index !== -1 && subProcesses[index]) {
             subProcesses[index].proc = proc;
+            subProcesses[index].isRunning = true;
         } else {
             subProcesses.push({ name, proc, isRunning: true });
         }
@@ -332,11 +348,11 @@ function runApp() {
 function runScript(command: string, args: string[], cwd?: string, name: string | null = null) {
     const proc = spawn(command, args, { stdio: ["pipe", "pipe", "pipe"], cwd });
     
-    proc.stderr?.on("data", (data: any) => {
+    proc.stderr?.on("data", (data: Buffer) => {
         show.error(data.toString(), true);
     });
     
-    proc.on("error", (error: any) => {
+    proc.on("error", (error: Error) => {
         show.error(`Error running ${command}: ${error.message}`);
     });
     

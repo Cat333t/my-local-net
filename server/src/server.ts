@@ -1,6 +1,7 @@
 import express from "express";
 import https from "https";
 import cors from "cors";
+import path from "path";
 import "dotenv/config";
 
 import api from "./api/routes.js";
@@ -8,6 +9,8 @@ import { createHttpsRedirectServer } from "./redirect.js";
 
 const PORT = process.env.SERVER_PORT ? Number(process.env.SERVER_PORT) : 81;
 const HOST = process.env.HOST || "0.0.0.0";
+
+const clientPath = path.resolve(__dirname, "../../", "client");
 
 const app = express();
 
@@ -19,11 +22,14 @@ app.use(cors({
 	methods: ["GET", "POST", "PATCH"]
 }));
 
-app.get("/", (req, res) => {
-	res.json({ message: "Hello, World!" });
-})
-
 app.use("/api", api);
+
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.resolve(clientPath, "dist")));
+	app.get("*", (req, res) => {
+		res.sendFile(path.resolve(clientPath, "dist", "index.html"));
+	});
+}
 
 if (process.env.HTTPS) {
 	const server = https.createServer(app);
@@ -32,7 +38,6 @@ if (process.env.HTTPS) {
 	app.listen(PORT, HOST, afterServerStart);
 }
 	
-
 function afterServerStart() {
 	if (process.env.HTTPS && PORT === 80) {
 		createHttpsRedirectServer();

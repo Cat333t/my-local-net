@@ -5,10 +5,11 @@
   "description": "",
   "author": "Kostya",
   "scripts": {
-    "start": "node server/dist/cli.js",
+    "start": "NODE_ENV=production node server/dist/cli.js",
     "build": "pnpm -r build",
-    "dev": "nodemon --no-stdin --exec \"tsx\" --signal SIGTERM server/src/cli.ts",
-    "dev:all": "pnpm -r dev"
+    "dev": "NODE_ENV=development nodemon --no-stdin --exec \"tsx\" --signal SIGTERM server/src/cli.ts",
+    "dev:all": "pnpm -r dev",
+    "test": "pnpm -r lint"
   },
   "type": "module",
   "keywords": [],

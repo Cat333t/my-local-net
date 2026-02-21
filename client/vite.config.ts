@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss()
   ],
   server: {
-    host: process.env.HOST || '0.0.0.0',
+    host: process.env.HOST || 'localhost',
     port: PORT,
     proxy: {
       '/api': {
