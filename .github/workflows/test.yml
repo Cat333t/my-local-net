@@ -13,12 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: 24
-          cache: pnpm
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm # caching npm packages
           
       - run: pnpm install
-      - run: pnpm test
-      - run: pnpm build
+      - run: pnpm test # run tests
+      - run: pnpm build # make build
