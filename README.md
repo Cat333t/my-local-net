@@ -1,6 +1,6 @@
 # 🌐 MLN – Personal YouTube Downloader & Offline Media Server
 
-**MLN** is a lightweight, self-hosted web application for your local network that allows you to:
+**My Local Net (MLN)** is a lightweight, self-hosted web application for your local network that allows you to:
 
 - Download YouTube videos manually or automatically 📥
 - Subscribe to YouTube channels and get new videos downloaded when internet is available 📡
@@ -9,13 +9,6 @@
 - Basic admin panel 🔒
 
 Perfect for people with slow/unstable internet, data caps, or who want to build their personal offline video archive.
-
-## 🏎️ Navigation
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Requirements](#requirements)
-- [Installation](#installation)
 
 ## ℹ️ Features
 
