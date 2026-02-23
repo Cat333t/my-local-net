@@ -7,16 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@types/dotenv':
-        specifier: ^8.2.3
-        version: 8.2.3
-      dotenv:
-        specifier: ^17.3.1
-        version: 17.3.1
-      tree-kill:
-        specifier: ^1.2.2
-        version: 1.2.2
     devDependencies:
       '@types/cross-spawn':
         specifier: ^6.0.6
@@ -91,12 +81,21 @@ importers:
       '@types/cors':
         specifier: ^2.8.19
         version: 2.8.19
+      '@types/dotenv':
+        specifier: ^8.2.3
+        version: 8.2.3
       cors:
         specifier: ^2.8.6
         version: 2.8.6
+      dotenv:
+        specifier: ^17.3.1
+        version: 17.3.1
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      tree-kill:
+        specifier: ^1.2.2
+        version: 1.2.2
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.2

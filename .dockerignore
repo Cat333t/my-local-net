@@ -1,0 +1,46 @@
+# node
+node_modules
+.pnpm-store
+.pnpm-debug.log
+npm-debug.log
+yarn.lock
+
+# logs
+logs
+*.log
+
+# env
+.env
+.env.*
+!.env.example
+
+# build outputs
+dist
+build
+.next
+out
+coverage
+
+# git
+.git
+.gitignore
+
+# Markdown
+README.md
+LICENSE
+
+# docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS / editors
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# tests
+__tests__
+*.spec.ts
+*.test.ts
