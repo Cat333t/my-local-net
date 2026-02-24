@@ -35,7 +35,7 @@ jobs:
           load: true
           tags: test-image:latest
       - name: Run container test
-        -env: 
+        env: 
           APP_PORT: 1337
           HOST: 0.0.0.0
         run: |
