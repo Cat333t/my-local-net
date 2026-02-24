@@ -22,6 +22,23 @@ jobs:
           node-version: 22
           cache: pnpm # caching npm packages
           
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm test # run tests
-      - run: pnpm build # make build
+      - name: Build
+        run: pnpm build # make build
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: test-image:latest
+      - name: Run container test
+        run: |
+          docker run -d -p 1337:1337 test-image:latest
+          for i in {1..10}; do
+            curl -s http://localhost:1337 && exit 0
+            sleep 3
+          done
+          exit 1
