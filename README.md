@@ -67,7 +67,7 @@ Change files in the `client` and `server` directories to update the application.
 
 ## 👥 Authors
 
-- [Cat333t](https://github.com/Cat333t)
+- [Kyst14](https://github.com/Kyst14)
 
 ## 📜 License
 
