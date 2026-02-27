@@ -11,7 +11,7 @@ COPY pnpm-lock.yaml package.json pnpm-workspace.yaml ./
 COPY client/package.json ./client/
 COPY server/package.json ./server/
 
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 RUN pnpm build
