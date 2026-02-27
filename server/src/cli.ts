@@ -9,16 +9,17 @@ import { fileURLToPath } from "url";
 import { ChildProcess } from "child_process";
 
 const protocol = process.env.HTTPS ? "https" : "http"
-const PORT = process.env.APP_PORT ? Number(process.env.APP_PORT) : 80
+const PORT = process.env.APP_PORT ? Number(process.env.APP_PORT) : 1337
 const HOST = process.env.HOST || "localhost"
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let isLogging = true
 
 const subProcesses: SubProcess[] = []
-const networkAddresses: { server: string[], client: string[] } = {
-    server: [], // http://192.168.1.14:81
-    client: [] // http://192.168.1.14:80
+const networkAddresses: { server: string[], client: string[], app: string[] } = {
+    server: [], // http://192.168.1.14:1338
+    client: [], // http://192.168.1.14:1337
+    app: [],    // http://192.168.1.14:1337
 }
 
 const rl: readline.ReadLine = readline.createInterface({
@@ -37,8 +38,9 @@ type SubProcess = {
 type Command = {
     name: string;
     shortcut?: string | string[];
+    prefix?: string | string[];
     description?: string;
-    action?: (rl: readline.ReadLine) => void;
+    action?: (prefix?: string[]) => void;
 };
 
 const commands: Command[] = [
@@ -91,8 +93,18 @@ const commands: Command[] = [
 
             for (const { name, proc, isRunning } of subProcesses) {
                 if (!proc) continue
-
-                const ip = name === "SERVER" ? networkAddresses.server[0] : name === "CLIENT" ? networkAddresses.client[0] : undefined;
+                const ip = (() => {
+                    switch (name) {
+                        case "SERVER":
+                            return networkAddresses.server[0];
+                        case "CLIENT":
+                            return networkAddresses.client[0];
+                        case "APP":
+                            return networkAddresses.app[0];
+                        default:
+                            return undefined;
+                    }
+                })();
 
                 show.log("━".repeat(process.stdout.columns / 2), true);
                 show.log(`${'Process name'.padEnd(20, " ")}: ${name}`, true);
@@ -116,8 +128,13 @@ const commands: Command[] = [
         action: () => {
             show.log(`📝 Mode: ${process.env.NODE_ENV || "development"}`, true);
             show.log(`🌐 Protocol: ${protocol}`, true);
-            show.log(`🏗️  Port app: ${PORT}`, true);
-            show.log(`💻 Port server: ${process.env.SERVER_PORT}`, true);
+
+            if (process.env.NODE_ENV !== "production") {
+                show.log(`🏗️  Port app: ${PORT}`, true);
+                show.log(`💻 Port server: ${process.env.SERVER_PORT}`, true);
+            } else {
+                show.log(`🏗️  Port: ${PORT}`, true);
+            }
         }
     },
     {
@@ -135,7 +152,8 @@ const commands: Command[] = [
     {
         name: "restart",
         shortcut: "r",
-        description: "Restart the server",
+        prefix: ["server", "client"],
+        description: "Restart all processes or specific process",
         action: () => {
             killHandler(subProcesses, false);
             runApp();
@@ -144,7 +162,8 @@ const commands: Command[] = [
     {
         name: "stop",
         shortcut: "k",
-        description: "Stop the server",
+        prefix: ["server", "client"],
+        description: "Stop all processes or specific process",
         action: () => {
             killHandler(subProcesses, false);
         }
@@ -225,14 +244,39 @@ async function enableCommands() {
     rl.prompt(true);
     rl.on("line", (input) => {
         input = input.trim().toLowerCase();
-        const command = commands.find((c) => c.shortcut === input || c.name === input || Array.isArray(c.shortcut) && c.shortcut.includes(input));
-        if (command) {
-            command.action?.(rl);
-        } else if (input) {
-            const shortInput = input.length > 20 ? `${input.slice(0, 17)}...${input.slice(-3)}` : input;
-            show.error(`Unknown command: "${shortInput}". Use "help" for available commands.`, true);
+        if (!input) {
+            rl.prompt(true);
+            return;
         }
-        rl.prompt(true);
+
+        const parts: string[] = input.split(" ");
+        const name = parts[0];
+        const args = parts.slice(1);
+
+        const command = commands.find(cmd => {
+            if (cmd.name === name) return true;
+
+            if (typeof cmd.shortcut === "string") {
+                return cmd.shortcut === name;
+            }
+
+            if (Array.isArray(cmd.shortcut) && name) {
+                return cmd.shortcut.includes(name);
+            }
+
+            return false;
+        });
+
+        if (!command) {
+            show.error(`Unknown command "${name}". Type "help" for available commands.`);
+            return;
+        }
+
+        try {
+            command.action?.(args);
+        } catch (e) {
+            show.error(`Command "${command.name}" failed: ${e}`);
+        }
     });
 }
 
@@ -258,7 +302,7 @@ function showNetworkInterfaces() {
                 if (address.family === 'IPv4' && address.internal === false) {
                     show.log(`   ➜ Network:  ${url(address.address)}`, true);
                     networkAddresses.client.push(url(address.address));   
-                    networkAddresses.server.push(url(address.address, Number(process.env.SERVER_PORT || 81)));                 
+                    networkAddresses.server.push(url(address.address, Number(process.env.SERVER_PORT || 1337)));                 
                 }
             }
         }
@@ -297,7 +341,7 @@ function runApp() {
         }
     });
 
-    function startProcess(name: string, filter: string) {
+    function startProcess(name: string, filter: string): void {
         const index = subProcesses.findIndex(p => p.name === name);
 
         const proc = runScript(
@@ -316,6 +360,22 @@ function runApp() {
     }
 
     try {
+        if (process.env.NODE_ENV === "production") {
+            show.log(`🚀 Running server...`, true)
+            startProcess("SERVER", "server");
+
+            // clear line
+            if (process.stdout.isTTY) {
+                readline.moveCursor(process.stdout, 0, -1);
+                readline.clearLine(process.stdout, 0);
+                readline.cursorTo(process.stdout, 0);
+            }
+
+            show.log(`🚀 Server is running`, true)
+
+            return;
+        }
+
         show.log(`🚀 Server is running...`, true)
         startProcess("SERVER", "server");
 
@@ -339,9 +399,10 @@ function runApp() {
         }
 
         show.log(`🌐 Client is running`, true)
+        return;
     } catch (e) {
         show.error(e);
-        return false;
+        return;
     }
 }
 

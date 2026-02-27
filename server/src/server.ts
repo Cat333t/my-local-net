@@ -11,9 +11,9 @@ import api from "./api/routes.js";
 import { createHttpsRedirectServer } from "./redirect.js";
 
 const appPort = process.env.APP_PORT ? Number(process.env.APP_PORT) : 1337;
-const PORT = process.env.SERVER_PORT
-	? process.env.NODE_ENV === "production" ? appPort : Number(process.env.SERVER_PORT)
-	: 1338;
+const PORT = process.env.NODE_ENV === "production" 
+	? appPort
+	: process.env.SERVER_PORT || 1338;
 
 const HOST = process.env.HOST || "localhost";
 
@@ -52,7 +52,7 @@ const server: http.Server = process.env.HTTPS
   ? https.createServer(app)
   : http.createServer(app);
 
-server.listen(PORT, HOST, afterServerStart);
+server.listen(Number(PORT), HOST, afterServerStart);
 	
 function afterServerStart() {
 	const protocol = process.env.HTTPS ? "https" : "http"
@@ -69,7 +69,7 @@ function afterServerStart() {
 			: false
 	}
 		
-	const url = (ip: string, port: number | string = PORT) => `${protocol}://${ip}${isDefaultPort(port) ? "" : `:${port}`}`
+	const url = (ip: string) => `${protocol}://${ip}${isDefaultPort(PORT) ? "" : `:${PORT}`}`
 
 	console.log("🌐 Network interfaces:");
 
